@@ -105,6 +105,23 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
         });
   }
 
+  void viewAuthorPopup() {
+    showCupertinoDialog(context: context, builder: (_) {
+      return CupertinoAlertDialog(
+        title: const Text("About me"),
+        content: const Text("Made with <3 by Fumaz.\nv1.693"),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('Thanks!'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          )
+        ],
+      );
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -138,6 +155,9 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
                 setState(() {
                   selectMood();
                 });
+              },
+              onLongPress: () {
+                viewAuthorPopup();
               },
               child: Text(getEmoji(mood),
                   style: const TextStyle(fontSize: 175)),

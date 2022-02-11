@@ -17,6 +17,8 @@ void main() async {
 }
 
 void showNotificationDaily() async {
+  tz.initializeTimeZones();
+
   Future<PermissionStatus> permissionStatus =
       NotificationPermissions.requestNotificationPermissions(
           iosSettings: const NotificationSettingsIos(
