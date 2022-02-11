@@ -57,7 +57,7 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
           return Container(
               height: 216,
               padding: const EdgeInsets.only(top: 6.0),
-              color: CupertinoColors.systemBackground,
+              color: isDarkMode() ? CupertinoColors.black : CupertinoColors.systemBackground,
               child: DefaultTextStyle(
                 style: const TextStyle(
                   fontSize: 22.0,
