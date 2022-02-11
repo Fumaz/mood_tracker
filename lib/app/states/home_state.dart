@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:mood_tracker/app/pages/home_page.dart';
 import 'package:mood_tracker/database/database.dart';
@@ -29,7 +30,7 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
 
   void selectMood() {
     FixedExtentScrollController controller =
-        FixedExtentScrollController(initialItem: 3);
+        FixedExtentScrollController(initialItem: Mood.values.indexOf(mood));
 
     showCupertinoModalPopup(
         context: context,
@@ -57,7 +58,9 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
           return Container(
               height: 216,
               padding: const EdgeInsets.only(top: 6.0),
-              color: isDarkMode() ? CupertinoColors.black : CupertinoColors.systemBackground,
+              color: isDarkMode()
+                  ? CupertinoColors.black
+                  : CupertinoColors.systemBackground,
               child: DefaultTextStyle(
                 style: const TextStyle(
                   fontSize: 22.0,
@@ -84,18 +87,27 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
         context: context,
         builder: (_) {
           return CupertinoAlertDialog(
-            title: const Text('Note'),
+            title: const Padding(
+                child: Text('Note'), padding: EdgeInsets.only(bottom: 15)),
             content: CupertinoTextField(
               minLines: 10,
-              maxLines: 20,
+              maxLines: 10,
+              maxLength: 500,
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
               controller: TextEditingController(text: note),
               onChanged: (value) {
-                note = value;
+                if (value.split("\n").length > 10) {
+                  value = value.split("\n").sublist(0, 10).join("\n");
+                }
+
+                setState(() {
+                  note = value;
+                });
               },
             ),
             actions: [
               CupertinoDialogAction(
-                child: const Text('OK'),
+                child: const Text('Save'),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -106,20 +118,22 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
   }
 
   void viewAuthorPopup() {
-    showCupertinoDialog(context: context, builder: (_) {
-      return CupertinoAlertDialog(
-        title: const Text("About me"),
-        content: const Text("Made with <3 by Fumaz.\nv1.693"),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('Thanks!'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          )
-        ],
-      );
-    });
+    showCupertinoDialog(
+        context: context,
+        builder: (_) {
+          return CupertinoAlertDialog(
+            title: const Text("About me"),
+            content: const Text("Made with <3 by Fumaz\nv1.693"),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('Thanks!'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+        });
   }
 
   @override
@@ -138,7 +152,11 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
           child: const Icon(CupertinoIcons.back),
         ),
         middle: GestureDetector(
-          child: Text(DateFormat('MMMM d').format(_selectedDate)),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(DateFormat('MMMM d').format(_selectedDate)),
+            Padding(padding: EdgeInsets.only(left: 10)),
+            const Icon(CupertinoIcons.calendar)
+          ]),
           onTap: () => selectDatePopup(),
         ),
         trailing: GestureDetector(
@@ -159,24 +177,34 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
               onLongPress: () {
                 viewAuthorPopup();
               },
-              child: Text(getEmoji(mood),
-                  style: const TextStyle(fontSize: 175)),
+              child:
+                  Text(getEmoji(mood), style: const TextStyle(fontSize: 175)),
             )
           ]),
           Text(
               mood == Mood.unknown
-                  ? "You haven't recorded your mood today."
-                  : "Today you are feeling " +
-                      mood.toString().split('.').last +
-                      "!",
-              style: TextStyle(fontSize: 20,
-              color: isDarkMode() ? Colors.white : Colors.black)),
+                  ? "Tap to record your mood!"
+                  : "You are feeling " + mood.toString().split('.').last + "!",
+              style: TextStyle(
+                  fontSize: 20,
+                  color: isDarkMode() ? Colors.white : Colors.black)),
           CupertinoButton(
-              child: Text(
-                "Click to " + ((note == null) ? "add" : "view") + " notes",
-                style: const TextStyle(fontSize: 20),
+              child: const Text(
+                "Click to add notes",
+                style: TextStyle(fontSize: 20),
               ),
-              onPressed: () => viewNotePopup())
+              onPressed: () => viewNotePopup()),
+          if (note != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 50.0),
+              child: Text(
+                note!,
+                style: TextStyle(
+                    fontSize: 20,
+                    color: isDarkMode() ? Colors.white : Colors.black),
+                textAlign: TextAlign.center,
+              ),
+            ),
         ],
       ),
     );

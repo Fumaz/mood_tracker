@@ -28,7 +28,7 @@ class Day {
 }
 
 enum Mood {
-  unknown, excited, happy, neutral, sad, stressed, angry, anxious
+  unknown, excited, happy, relaxed, neutral, sad, stressed, angry
 }
 
 String getEmoji(Mood mood) {
@@ -39,6 +39,8 @@ String getEmoji(Mood mood) {
       return '😄';
     case Mood.happy:
       return '😃';
+    case Mood.relaxed:
+      return '😊';
     case Mood.neutral:
       return '😐';
     case Mood.sad:
@@ -47,8 +49,6 @@ String getEmoji(Mood mood) {
       return '😕';
     case Mood.angry:
       return '😡';
-    case Mood.anxious:
-      return '😱';
   }
 }
 
