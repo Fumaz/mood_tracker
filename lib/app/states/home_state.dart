@@ -6,6 +6,7 @@ import 'package:mood_tracker/app/pages/home_page.dart';
 import 'package:mood_tracker/database/database.dart';
 
 import '../app.dart';
+import '../charts.dart';
 
 class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
   DateTime _selectedDate = DateTime.now();
@@ -136,6 +137,36 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
         });
   }
 
+  void viewChartPopup() {
+    SimpleTimeSeriesChart.createSeries().then((value) {
+      showCupertinoDialog(
+          context: context,
+          builder: (_) {
+            return CupertinoAlertDialog(
+              title: const Text("Last 7 days"),
+              content: SizedBox(
+                  width: 700,
+                  height: 300,
+                  child: Column(children: [
+                    SizedBox(
+                      width: 700,
+                      height: 235,
+                      child: SimpleTimeSeriesChart(
+                        value,
+                        animate: true,
+                      ),
+                    ),
+                    CupertinoButton(
+                        child: const Text("Close"),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        })
+                  ])),
+            );
+          });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -147,6 +178,7 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         leading: GestureDetector(
+          onLongPress: () => viewChartPopup(),
           onTap: () =>
               selectDate(_selectedDate.subtract(const Duration(days: 1))),
           child: const Icon(CupertinoIcons.back),
@@ -154,7 +186,7 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
         middle: GestureDetector(
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(DateFormat('MMMM d').format(_selectedDate)),
-            Padding(padding: EdgeInsets.only(left: 10)),
+            const Padding(padding: EdgeInsets.only(left: 10)),
             const Icon(CupertinoIcons.calendar)
           ]),
           onTap: () => selectDatePopup(),

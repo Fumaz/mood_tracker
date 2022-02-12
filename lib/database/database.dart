@@ -25,10 +25,27 @@ class Day {
   String toString() {
     return 'Day{day: $day, month: $month, year: $year, mood: $mood, note: $note}';
   }
+
+  DateTime get dateTime => DateTime(year, month, day);
 }
 
-enum Mood {
-  unknown, excited, happy, relaxed, neutral, sad, stressed, angry
+enum Mood { unknown, excited, happy, relaxed, neutral, sad, stressed, angry }
+
+Color getColor(Mood mood) {
+  switch (mood) {
+    case Mood.excited:
+    case Mood.happy:
+    case Mood.relaxed:
+      return CupertinoColors.activeGreen;
+    case Mood.neutral:
+      return CupertinoColors.systemYellow;
+    case Mood.sad:
+    case Mood.stressed:
+    case Mood.angry:
+      return CupertinoColors.destructiveRed;
+    default:
+      return CupertinoColors.inactiveGray;
+  }
 }
 
 String getEmoji(Mood mood) {
@@ -88,6 +105,18 @@ Future<List<Day>> days() async {
       note: maps[i]['note'],
     );
   });
+}
+
+Future<List<Day>> last(int amount) async {
+  List<Day> data = await days();
+
+  data.removeWhere((element) =>
+      element.dateTime
+          .isBefore(DateTime.now().subtract(Duration(days: amount))) ||
+      element.dateTime.isAfter(DateTime.now()) ||
+      element.mood == null);
+
+  return data;
 }
 
 Future<Day> day(int day, int month, int year) async {
