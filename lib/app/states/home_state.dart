@@ -8,10 +8,12 @@ import 'package:mood_tracker/database/database.dart';
 import '../app.dart';
 import '../charts.dart';
 
-class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
+class MoodTrackerHomeState extends State<MoodTrackerHomePage>
+    with TickerProviderStateMixin {
   DateTime _selectedDate = DateTime.now();
   Mood mood = Mood.unknown;
   String? note;
+  var _controller;
 
   void selectDate(DateTime date) {
     if (mood != Mood.unknown || note != null) {
@@ -171,6 +173,15 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
   void initState() {
     super.initState();
     selectDate(DateTime.now());
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..addListener(() {
+      setState(() {
+
+        });
+    })..animateTo(0);
   }
 
   @override
@@ -196,48 +207,53 @@ class MoodTrackerHomeState extends State<MoodTrackerHomePage> {
           child: const Icon(CupertinoIcons.forward),
         ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  selectMood();
-                });
-              },
-              onLongPress: () {
-                viewAuthorPopup();
-              },
-              child:
-                  Text(getEmoji(mood), style: const TextStyle(fontSize: 175)),
-            )
-          ]),
-          Text(
-              mood == Mood.unknown
-                  ? "Tap to record your mood!"
-                  : "You are feeling " + mood.toString().split('.').last + "!",
-              style: TextStyle(
-                  fontSize: 20,
-                  color: isDarkMode() ? Colors.white : Colors.black)),
-          CupertinoButton(
-              child: const Text(
-                "Click to add notes",
-                style: TextStyle(fontSize: 20),
-              ),
-              onPressed: () => viewNotePopup()),
-          if (note != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 50.0),
-              child: Text(
-                note!,
+      child: Transform.translate(
+        offset: Offset(100.0 * _controller.value, 0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectMood();
+                  });
+                },
+                onLongPress: () {
+                  viewAuthorPopup();
+                },
+                child:
+                    Text(getEmoji(mood), style: const TextStyle(fontSize: 175)),
+              )
+            ]),
+            Text(
+                mood == Mood.unknown
+                    ? "Tap to record your mood!"
+                    : "You are feeling " +
+                        mood.toString().split('.').last +
+                        "!",
                 style: TextStyle(
                     fontSize: 20,
-                    color: isDarkMode() ? Colors.white : Colors.black),
-                textAlign: TextAlign.center,
+                    color: isDarkMode() ? Colors.white : Colors.black)),
+            CupertinoButton(
+                child: const Text(
+                  "Click to add notes",
+                  style: TextStyle(fontSize: 20),
+                ),
+                onPressed: () => viewNotePopup()),
+            if (note != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 50.0),
+                child: Text(
+                  note!,
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: isDarkMode() ? Colors.white : Colors.black),
+                  textAlign: TextAlign.center,
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
